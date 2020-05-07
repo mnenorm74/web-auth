@@ -16,29 +16,24 @@ namespace IdentityServer
             };
 
         public static IEnumerable<ApiResource> Apis =>
-            new ApiResource[] 
+            new ApiResource[]
             {
-                new ApiResource("api1", "My API")
+                new ApiResource("photos_service", "Сервис фотографий")
             };
-        
+
         public static IEnumerable<Client> Clients =>
             new Client[] 
             {
                 new Client
                 {
-                    ClientId = "client",
-
-                    // no interactive user, use the clientid/secret for authentication
-                    AllowedGrantTypes = GrantTypes.ClientCredentials,
-
-                    // secret for authentication
+                    ClientId = "Photos App by OAuth",
                     ClientSecrets =
                     {
                         new Secret("secret".Sha256())
                     },
 
-                    // scopes that client has access to
-                    AllowedScopes = { "api1" }
+                    AllowedGrantTypes = GrantTypes.ClientCredentials,
+                    AllowedScopes = { "photos_service" }
                 }
             };
     }
