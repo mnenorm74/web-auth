@@ -1,7 +1,9 @@
-using System;
+﻿using System;
+using System.IdentityModel.Tokens.Jwt;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
@@ -119,6 +121,28 @@ namespace PhotosApp.Areas.Identity
                                 return Task.CompletedTask;
                             }
                         };
+                    });
+
+
+                services.AddAuthentication()
+                    .AddOpenIdConnect("Passport", "Паспорт", options =>
+                    {
+                        options.Authority = "https://localhost:7001";
+
+                        options.ClientId = "Photos App by OIDC";
+                        options.ClientSecret = "secret";
+                        options.ResponseType = "code";
+
+                        // NOTE: oidc и profile уже добавлены по-умолчанию
+                        options.Scope.Add("email");
+
+                        options.CallbackPath = "/signin-passport";
+
+                        // NOTE: все эти проверки токена выполняются по умолчанию, указаны для ознакомления
+                        options.TokenValidationParameters.ValidateIssuer = true; // проверка издателя
+                        options.TokenValidationParameters.ValidateAudience = true; // проверка получателя
+                        options.TokenValidationParameters.ValidateLifetime = true; // проверка не протух ли
+                        options.TokenValidationParameters.RequireSignedTokens = true; // есть ли валидная подпись издателя
                     });
 
 
