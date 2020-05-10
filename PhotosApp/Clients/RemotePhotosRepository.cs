@@ -1,6 +1,11 @@
 ﻿using AutoMapper;
 using IdentityModel.Client;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.Net.Http.Headers;
 using Newtonsoft.Json;
 using PhotosApp.Clients.Exceptions;
@@ -22,11 +27,15 @@ namespace PhotosApp.Clients
     {
         private readonly string serviceUrl;
         private readonly IMapper mapper;
+        private readonly IHttpContextAccessor httpContextAccessor;
 
-        public RemotePhotosRepository(IOptions<PhotosServiceOptions> options, IMapper mapper)
+        public RemotePhotosRepository(IOptions<PhotosServiceOptions> options,
+            IMapper mapper,
+            IHttpContextAccessor httpContextAccessor)
         {
             serviceUrl = options.Value.ServiceUrl;
             this.mapper = mapper;
+            this.httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<PhotoEntity> GetPhotoMetaAsync(Guid id)
@@ -200,8 +209,16 @@ namespace PhotosApp.Clients
 
         private async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request)
         {
+            var httpContext = httpContextAccessor.HttpContext;
+            
+            // NOTE: По умолчанию используется DefaultAuthenticateScheme, либо DefaultScheme.
+            var accessToken = await httpContext.GetTokenAsync(
+                IdentityConstants.ApplicationScheme,
+                OpenIdConnectParameterNames.AccessToken);
+            if (accessToken == null)
+                return new HttpResponseMessage(HttpStatusCode.Unauthorized);
+
             var httpClient = new HttpClient();
-            var accessToken = await GetAccessTokenByClientCredentialsAsync();
             httpClient.SetBearerToken(accessToken);
             var response = await httpClient.SendAsync(request);
             return response;

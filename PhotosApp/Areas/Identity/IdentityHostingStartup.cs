@@ -136,6 +136,7 @@ namespace PhotosApp.Areas.Identity
                         // NOTE: oidc и profile уже добавлены по-умолчанию
                         options.Scope.Add("email");
                         options.Scope.Add("photos_app");
+                        options.Scope.Add("photos_service");
 
                         options.CallbackPath = "/signin-passport";
                         options.SignedOutCallbackPath = "/signout-callback-passport";

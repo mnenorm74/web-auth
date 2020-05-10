@@ -52,7 +52,7 @@ namespace IdentityServer
                     // Это полезно для SPA и мобильных приложений, где client secret хранится у пользователя
                     RequirePkce = true,
                     // NOTE: показывать ли пользователю страницу consent со списком запрошенных разрешений
-                    RequireConsent = false,
+                    RequireConsent = true,
 
                     // NOTE: куда отправлять после логина
                     RedirectUris = { "https://localhost:5001/signin-passport" },
@@ -68,7 +68,8 @@ namespace IdentityServer
                         IdentityServerConstants.StandardScopes.Profile,
                         // NOTE: Позволяет запрашивать email пользователя через id token
                         IdentityServerConstants.StandardScopes.Email,
-                        "photos_app"
+                        "photos_app",
+                        "photos_service"
                     },
 
                     // NOTE: Надо ли добавлять информацию о пользователе в id token при запросе одновременно
