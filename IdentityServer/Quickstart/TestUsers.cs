@@ -40,6 +40,28 @@ namespace IdentityServer
                     new Claim(JwtClaimTypes.Address, @"{ 'street_address': 'One Hacker Way', 'locality': 'Heidelberg', 'postal_code': 69118, 'country': 'Germany' }", IdentityServer4.IdentityServerConstants.ClaimValueTypes.Json),
                     new Claim("location", "somewhere")
                 }
+            },
+            new TestUser{SubjectId = "a83b72ed-3f99-44b5-aa32-f9d03e7eb1fd", Username = "vicky@gmail.com", Password = "Pass!2",
+                Claims =
+                {
+                    new Claim(JwtClaimTypes.Email, "vicky@gmail.com"),
+                    new Claim("testing", "beta"),
+                }
+            },
+            new TestUser{SubjectId = "dcaec9ce-91c9-4105-8d4d-eee3365acd82", Username = "cristina@gmail.com", Password = "Pass!2",
+                Claims =
+                {
+                    new Claim(JwtClaimTypes.Email, "cristina@gmail.com"),
+                    new Claim("subscription", "paid"),
+                }
+            },
+            new TestUser{SubjectId = "b9991f69-b4c1-477d-9432-2f7cf6099e02", Username = "dev@gmail.com", Password = "Pass!2",
+                Claims =
+                {
+                    new Claim(JwtClaimTypes.Email, "dev@gmail.com"),
+                    new Claim("subscription", "paid"),
+                    new Claim("role", "Dev")
+                }
             }
         };
     }

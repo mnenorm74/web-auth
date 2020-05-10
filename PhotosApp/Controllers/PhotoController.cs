@@ -148,7 +148,8 @@ namespace PhotosApp.Controllers
 
         private string GetOwnerId()
         {
-            return User.FindFirstValue(ClaimTypes.NameIdentifier);
+            //return User.FindFirstValue(ClaimTypes.NameIdentifier);
+            return User.FindFirstValue("passport_id");
         }
     }
 }

@@ -147,6 +147,9 @@ namespace PhotosApp.Areas.Identity.Pages.Account
                             await _userManager.AddClaimAsync(user, info.Principal.FindFirst("subscription"));
                         if (info.Principal.HasClaim(c => c.Type == "testing"))
                             await _userManager.AddClaimAsync(user, info.Principal.FindFirst("testing"));
+                        if (info.Principal.HasClaim(c => c.Type == ClaimTypes.NameIdentifier))
+                            await _userManager.AddClaimAsync(user, new Claim("passport_id",
+                                info.Principal.FindFirstValue(ClaimTypes.NameIdentifier)));
 
                         var userId = await _userManager.GetUserIdAsync(user);
                         var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
