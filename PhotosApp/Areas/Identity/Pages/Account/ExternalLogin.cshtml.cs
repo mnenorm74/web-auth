@@ -131,6 +131,14 @@ namespace PhotosApp.Areas.Identity.Pages.Account
                     {
                         _logger.LogInformation("User created an account using {Name} provider.", info.LoginProvider);
 
+                        // NOTE: сохранение полученные от провайдера claims
+                        if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Role))
+                            await _userManager.AddClaimAsync(user, info.Principal.FindFirst(ClaimTypes.Role));
+                        if (info.Principal.HasClaim(c => c.Type == "subscription"))
+                            await _userManager.AddClaimAsync(user, info.Principal.FindFirst("subscription"));
+                        if (info.Principal.HasClaim(c => c.Type == "testing"))
+                            await _userManager.AddClaimAsync(user, info.Principal.FindFirst("testing"));
+
                         var userId = await _userManager.GetUserIdAsync(user);
                         var code = await _userManager.GenerateEmailConfirmationTokenAsync(user);
                         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
