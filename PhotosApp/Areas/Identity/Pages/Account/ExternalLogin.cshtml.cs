@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -6,6 +6,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
@@ -86,7 +87,15 @@ namespace PhotosApp.Areas.Identity.Pages.Account
             var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, isPersistent: false, bypassTwoFactor : true);
             if (result.Succeeded)
             {
+                // NOTE: перелогин с сохранением полученных от провайдера токенов
+                var user = await _userManager.FindByLoginAsync(info.LoginProvider, info.ProviderKey);
+                var props = new AuthenticationProperties();
+                props.StoreTokens(info.AuthenticationTokens);
+                props.IsPersistent = info.LoginProvider == "Passport";
+                await _signInManager.SignInAsync(user, props, info.LoginProvider);
+
                 _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
+
                 return LocalRedirect(returnUrl);
             }
             if (result.IsLockedOut)
@@ -157,7 +166,11 @@ namespace PhotosApp.Areas.Identity.Pages.Account
                             return RedirectToPage("./RegisterConfirmation", new { Email = Input.Email });
                         }
 
-                        await _signInManager.SignInAsync(user, isPersistent: false, info.LoginProvider);
+                        // NOTE: сохранение полученных от провайдера токенов
+                        var props = new AuthenticationProperties();
+                        props.StoreTokens(info.AuthenticationTokens);
+                        props.IsPersistent = info.LoginProvider == "Passport";
+                        await _signInManager.SignInAsync(user, props, info.LoginProvider);
 
                         return LocalRedirect(returnUrl);
                     }

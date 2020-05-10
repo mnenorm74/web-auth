@@ -1,6 +1,7 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
@@ -31,6 +32,13 @@ namespace PhotosApp.Areas.Identity.Pages.Account
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
+            if (User?.FindFirst(ClaimTypes.AuthenticationMethod)?.Value == "Passport")
+            {
+                return SignOut("Passport");
+                // NOTE: это более явный вариант предыдущей строчки
+                //await HttpContext.SignOutAsync("Passport");
+                //return new EmptyResult();
+            }
             if (returnUrl != null)
             {
                 return LocalRedirect(returnUrl);
