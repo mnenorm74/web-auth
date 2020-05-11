@@ -160,6 +160,31 @@ namespace PhotosApp.Areas.Identity
                         options.TokenValidationParameters.ValidateLifetime = true; // проверка не протух ли
                         options.TokenValidationParameters.RequireSignedTokens = true; // есть ли валидная подпись издателя
 
+                        options.Events = new OpenIdConnectEvents()
+                        {
+                            OnTokenResponseReceived = context =>
+                            {
+                                var tokenResponse = context.TokenEndpointResponse;
+
+                                var tokenHandler = new JwtSecurityTokenHandler();
+                                if (tokenResponse.AccessToken != null)
+                                {
+                                    var accessToken = tokenHandler.ReadToken(tokenResponse.AccessToken);
+                                }
+                                if (tokenResponse.IdToken != null)
+                                {
+                                    var idToken = tokenHandler.ReadToken(tokenResponse.IdToken);
+                                }
+                                if (tokenResponse.RefreshToken != null)
+                                {
+                                    // NOTE: Это не JWT-токен
+                                    var refreshToken = tokenResponse.RefreshToken;
+                                }
+
+                                return Task.CompletedTask;
+                            }
+                        };
+
                         options.SaveTokens = true;
                     });
 
