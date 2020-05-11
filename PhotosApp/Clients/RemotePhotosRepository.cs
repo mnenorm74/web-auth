@@ -217,9 +217,7 @@ namespace PhotosApp.Clients
             var httpContext = httpContextAccessor.HttpContext;
 
             // NOTE: По умолчанию используется DefaultAuthenticateScheme, либо DefaultScheme.
-            var accessToken = await httpContext.GetTokenAsync(
-                IdentityConstants.ApplicationScheme,
-                OpenIdConnectParameterNames.AccessToken);
+            var accessToken = await httpContext.GetTokenAsync(OpenIdConnectParameterNames.AccessToken);
             if (accessToken == null)
                 return new HttpResponseMessage(HttpStatusCode.Unauthorized);
 
@@ -234,9 +232,7 @@ namespace PhotosApp.Clients
                     return response;
             }
 
-            var refreshToken = await httpContext.GetTokenAsync(
-                IdentityConstants.ApplicationScheme,
-                OpenIdConnectParameterNames.RefreshToken);
+            var refreshToken = await httpContext.GetTokenAsync(OpenIdConnectParameterNames.RefreshToken);
             if (refreshToken == null)
                 return new HttpResponseMessage(HttpStatusCode.Unauthorized);
 

@@ -17,36 +17,36 @@ namespace PhotosApp.Data
     {
         public static void PrepareDB(this IHost host)
         {
-            using (var scope = host.Services.CreateScope())
-            {
-                try
-                {
-                    var env = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
-                    if (env.IsDevelopment())
-                    {
-                        scope.ServiceProvider.GetRequiredService<PhotosDbContext>().Database.Migrate();
-                        scope.ServiceProvider.GetRequiredService<UsersDbContext>().Database.Migrate();
-                        scope.ServiceProvider.GetRequiredService<TicketsDbContext>().Database.Migrate();
+            //using (var scope = host.Services.CreateScope())
+            //{
+            //    try
+            //    {
+            //        var env = scope.ServiceProvider.GetRequiredService<IWebHostEnvironment>();
+            //        if (env.IsDevelopment())
+            //        {
+            //            scope.ServiceProvider.GetRequiredService<PhotosDbContext>().Database.Migrate();
+            //            scope.ServiceProvider.GetRequiredService<UsersDbContext>().Database.Migrate();
+            //            scope.ServiceProvider.GetRequiredService<TicketsDbContext>().Database.Migrate();
 
-                        var photosDbContext = scope.ServiceProvider.GetRequiredService<PhotosDbContext>();
-                        photosDbContext.SeedWithSamplePhotosAsync().Wait();
+            //            var photosDbContext = scope.ServiceProvider.GetRequiredService<PhotosDbContext>();
+            //            photosDbContext.SeedWithSamplePhotosAsync().Wait();
 
-                        var ticketsDbContext = scope.ServiceProvider.GetRequiredService<TicketsDbContext>();
-                        ticketsDbContext.SeedWithSampleTicketsAsync().Wait();
+            //            var ticketsDbContext = scope.ServiceProvider.GetRequiredService<TicketsDbContext>();
+            //            ticketsDbContext.SeedWithSampleTicketsAsync().Wait();
 
-                        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-                        roleManager.SeedWithSampleRolesAsync().Wait();
+            //            var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+            //            roleManager.SeedWithSampleRolesAsync().Wait();
 
-                        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<PhotosAppUser>>();
-                        userManager.SeedWithSampleUsersAsync().Wait();
-                    }
-                }
-                catch (Exception e)
-                {
-                    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
-                    logger.LogError(e, "An error occurred while migrating or seeding the database.");
-                }
-            }
+            //            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<PhotosAppUser>>();
+            //            userManager.SeedWithSampleUsersAsync().Wait();
+            //        }
+            //    }
+            //    catch (Exception e)
+            //    {
+            //        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+            //        logger.LogError(e, "An error occurred while migrating or seeding the database.");
+            //    }
+            //}
         }
 
         private static async Task SeedWithSamplePhotosAsync(this PhotosDbContext dbContext)
