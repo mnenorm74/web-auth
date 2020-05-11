@@ -12,6 +12,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Protocols;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Microsoft.IdentityModel.Tokens;
 using PhotosApp.Areas.Identity.Data;
 using PhotosApp.Services;
@@ -124,10 +126,18 @@ namespace PhotosApp.Areas.Identity
                     });
 
 
+                const string oidcAuthority = "https://localhost:7001";
+                var oidcConfigurationManager = new ConfigurationManager<OpenIdConnectConfiguration>(
+                    $"{oidcAuthority}/.well-known/openid-configuration",
+                    new OpenIdConnectConfigurationRetriever(),
+                    new HttpDocumentRetriever());
+
+                services.AddSingleton<IConfigurationManager<OpenIdConnectConfiguration>>(oidcConfigurationManager);
+
                 services.AddAuthentication()
                     .AddOpenIdConnect("Passport", "Паспорт", options =>
                     {
-                        options.Authority = "https://localhost:7001";
+                        options.Authority = oidcAuthority;
 
                         options.ClientId = "Photos App by OIDC";
                         options.ClientSecret = "secret";
@@ -137,9 +147,12 @@ namespace PhotosApp.Areas.Identity
                         options.Scope.Add("email");
                         options.Scope.Add("photos_app");
                         options.Scope.Add("photos_service");
+                        options.Scope.Add("offline_access");
 
                         options.CallbackPath = "/signin-passport";
                         options.SignedOutCallbackPath = "/signout-callback-passport";
+
+                        options.ConfigurationManager = oidcConfigurationManager;
 
                         // NOTE: все эти проверки токена выполняются по умолчанию, указаны для ознакомления
                         options.TokenValidationParameters.ValidateIssuer = true; // проверка издателя

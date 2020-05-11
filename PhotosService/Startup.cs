@@ -11,6 +11,7 @@ using PhotosService.Data;
 using PhotosService.Models;
 using PhotosService.Services;
 using Serilog;
+using System;
 using System.Threading.Tasks;
 
 namespace PhotosService
@@ -52,6 +53,8 @@ namespace PhotosService
                             return Task.CompletedTask;
                         }
                     };
+
+                    options.TokenValidationParameters.ClockSkew = TimeSpan.Zero;
                 });
 
             var connectionString = configuration.GetConnectionString("PhotosDbContextConnection")
