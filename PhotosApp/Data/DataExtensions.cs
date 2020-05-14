@@ -28,8 +28,11 @@ namespace PhotosApp.Data
                         var photosDbContext = scope.ServiceProvider.GetRequiredService<PhotosDbContext>();
                         photosDbContext.SeedWithSamplePhotosAsync().Wait();
                         
-                        var users = scope.ServiceProvider.GetRequiredService<UserManager<PhotoAppUser>>();
-                        users.SeedWithSampleUsersAsync().Wait();
+                        var usersDbContext = scope.ServiceProvider.GetRequiredService<UserManager<PhotoAppUser>>();
+                        usersDbContext.SeedWithSampleUsersAsync().Wait();
+
+                        var ticketsDbContext = scope.ServiceProvider.GetRequiredService<TicketsDbContext>();
+                        ticketsDbContext.SeedWithSampleTicketsAsync().Wait();
                     }
                 }
                 catch (Exception e)

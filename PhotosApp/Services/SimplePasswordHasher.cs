@@ -41,7 +41,7 @@ namespace PhotosApp.Services
             
             var expectedSubKeyBytes = new byte[hashedPasswordBytes.Length - salt.Length];
             Buffer.BlockCopy(hashedPasswordBytes, salt.Length,
-                expectedSubKeyBytes, 0, expectedSubKeyBytes.Length)
+                expectedSubKeyBytes, 0, expectedSubKeyBytes.Length);
 
             var actualSubKeyBytes = GetSubkeyBytes(providedPassword, salt);
 
