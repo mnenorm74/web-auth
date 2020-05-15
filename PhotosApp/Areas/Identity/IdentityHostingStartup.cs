@@ -1,12 +1,17 @@
 using System;
+using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using PhotosApp.Areas.Identity.Data;
 using PhotosApp.Services;
 using PhotosApp.Services.Authorization;
@@ -37,7 +42,7 @@ namespace PhotosApp.Areas.Identity
 
                 services.AddScoped<IPasswordHasher<PhotoAppUser>, SimplePasswordHasher<PhotoAppUser>>();
                 services.AddScoped<IAuthorizationHandler, MustOwnPhotoHandler>();
-                
+
                 services.Configure<IdentityOptions>(options =>
                 {
                     options.Password.RequireDigit = false;
@@ -68,6 +73,11 @@ namespace PhotosApp.Areas.Identity
 
                 services.AddAuthorization(options =>
                 {
+                    options.DefaultPolicy = new AuthorizationPolicyBuilder(
+                            JwtBearerDefaults.AuthenticationScheme,
+                            IdentityConstants.ApplicationScheme)
+                        .RequireAuthenticatedUser()
+                        .Build();
                     options.AddPolicy(
                         "Beta",
                         policyBuilder =>
@@ -89,6 +99,46 @@ namespace PhotosApp.Areas.Identity
                             policyBuilder.RequireAuthenticatedUser();
                             policyBuilder.AddRequirements(new MustOwnPhotoRequirement());
                         });
+                    options.AddPolicy(
+                        "Dev", 
+                        policyBuilder => 
+                        { 
+                            policyBuilder.RequireAuthenticatedUser(); 
+                            policyBuilder.RequireRole("Dev"); policyBuilder.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme, IdentityConstants.ApplicationScheme); 
+                            });
+                });
+
+                services.AddTransient<IEmailSender, SimpleEmailSender>(serviceProvider =>
+                    new SimpleEmailSender(
+                        serviceProvider.GetRequiredService<ILogger<SimpleEmailSender>>(),
+                        serviceProvider.GetRequiredService<IWebHostEnvironment>(),
+                        context.Configuration["SimpleEmailSender:Host"],
+                        context.Configuration.GetValue<int>("SimpleEmailSender:Port"),
+                        context.Configuration.GetValue<bool>("SimpleEmailSender:EnableSSL"),
+                        context.Configuration["SimpleEmailSender:UserName"],
+                        context.Configuration["SimpleEmailSender:Password"]
+                    ));
+                services.AddAuthentication()
+                .AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = false;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuer = false,
+                        ValidateAudience = false,
+                        ValidateLifetime = true,
+                        ClockSkew = TimeSpan.Zero,
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = TemporaryTokens.SigningKey
+                    };
+                    options.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = c =>
+                        {
+                            c.Token = c.Request.Cookies[TemporaryTokens.CookieName];
+                            return Task.CompletedTask;
+                        }
+                    };
                 });
             });
         }
